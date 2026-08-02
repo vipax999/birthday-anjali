@@ -77,58 +77,77 @@ function Confetti() {
 }
 
 function BirthdaySong() {
-  const audio = useRef<HTMLAudioElement>(null)
+  const ctxRef = useRef<AudioContext | null>(null)
+  const bufferRef = useRef<AudioBuffer | null>(null)
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null)
+  const playingRef = useRef(false)
   const [playing, setPlaying] = useState(false)
+  const [ready, setReady] = useState(false)
 
-  useEffect(() => {
-    const el = audio.current
-    if (!el) return
-    const target = el
-    let started = false
-
-    el.play()
+  function start() {
+    if (playingRef.current) return
+    const ctx = ctxRef.current
+    if (!ctx || !bufferRef.current) return
+    ctx.resume()
       .then(() => {
-        started = true
+        if (playingRef.current || !bufferRef.current) return
+        const src = ctx.createBufferSource()
+        src.buffer = bufferRef.current
+        src.loop = true
+        src.connect(ctx.destination)
+        src.start()
+        sourceRef.current = src
+        playingRef.current = true
         setPlaying(true)
       })
       .catch(() => {})
+  }
 
-    function tryPlay() {
-      if (started) return
-      target.play().then(() => {
-        started = true
-        setPlaying(true)
-      }).catch(() => {})
-    }
+  useEffect(() => {
+    let cancelled = false
+    const Ctx: typeof AudioContext =
+      window.AudioContext || (window as any).webkitAudioContext
+    const ctx = new Ctx()
+    ctxRef.current = ctx
+
+    fetch(`${import.meta.env.BASE_URL}birthday-song.mp3`)
+      .then((r) => r.arrayBuffer())
+      .then((buf) => ctx.decodeAudioData(buf))
+      .then((audioBuf) => {
+        if (cancelled) return
+        bufferRef.current = audioBuf
+        setReady(true)
+      })
+      .catch(() => {})
 
     const opts = { capture: true, passive: true }
     const events = ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll']
-    events.forEach((e) => window.addEventListener(e, tryPlay, opts))
+    events.forEach((e) => window.addEventListener(e, start, opts))
     return () => {
-      events.forEach((e) => window.removeEventListener(e, tryPlay, opts))
+      cancelled = true
+      events.forEach((e) => window.removeEventListener(e, start, opts))
+      ctx.close().catch(() => {})
     }
   }, [])
 
   function toggle() {
-    const el = audio.current
-    if (!el) return
-    if (playing) {
-      el.pause()
+    const ctx = ctxRef.current
+    if (!ctx) return
+    if (playingRef.current) {
+      ctx.suspend()
+      playingRef.current = false
       setPlaying(false)
     } else {
-      el.play()
-        .then(() => setPlaying(true))
-        .catch(() => {})
+      start()
     }
   }
 
   return (
     <>
-      <audio ref={audio} src={`${import.meta.env.BASE_URL}birthday-song.mp3`} loop preload="auto" />
       <button className="bd-song-btn" onClick={toggle} aria-label="birthday song">
         {playing ? '❚❚' : '▶'}
       </button>
-      {!playing && <span className="bd-song-hint">tap anywhere · music ♪</span>}
+      {!playing && ready && <span className="bd-song-hint">tap anywhere · music ♪</span>}
     </>
   )
 }
