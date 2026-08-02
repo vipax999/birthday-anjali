@@ -1,0 +1,266 @@
+/* DeskFolio ships its own styles (vendored in src/deskfolio).
+   Keep this file minimal so nothing overrides the desk scene. */
+#root {
+  min-height: 100dvh;
+}
+
+body {
+  font-family: 'Nunito', 'Quicksand', ui-rounded, system-ui, sans-serif;
+}
+
+.deskfolio {
+  --df-font-round: 'Nunito', 'Quicksand', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+  --df-font-hand: 'Caveat', 'Segoe Script', cursive;
+}
+
+/* Full-screen desk: no page padding, stage bleeds edge to edge. */
+.page.page-deskfolio {
+  padding: 0;
+  min-height: 100dvh;
+}
+
+/* Desktop-only full-bleed hack: the 100vw + translate(-50%) trick relies on
+   deskfolio's margin-left:50%. On phones deskfolio zeroes that margin, so the
+   translate would shove the stage half off-screen — let its own mobile layout
+   (@media max-width:760px) handle sizing instead. */
+@media (min-width: 761px) {
+  .page-deskfolio .deskfolio-demo-stage {
+    width: 100vw;
+    min-height: 100dvh;
+    border-radius: 0;
+    transform: translate(-50%);
+  }
+}
+
+/* Anjali's photo on the about page — bigger than the stock 62px avatar. */
+.df-avatar.df-avatar--big {
+  width: 104px;
+  height: 104px;
+}
+
+.df-avatar.df-avatar--big img {
+  object-fit: cover;
+}
+
+/* --- PullCord room light ------------------------------------------------ */
+.room {
+  --pullcord-right: 3.5rem;
+  --pullcord-z: 40;
+  --pullcord-ink: rgba(46, 36, 40, 0.5);
+}
+
+.room--dark {
+  --pullcord-ink: rgba(255, 244, 214, 0.5);
+}
+
+/* Dims the whole desk when the cord is pulled — like switching the room light off. */
+.room-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 95% at 77% -5%, rgba(255, 214, 140, 0.1) 0%, rgba(9, 7, 16, 0) 30%),
+    radial-gradient(125% 100% at 50% 10%, rgba(9, 7, 16, 0.42) 0%, rgba(9, 7, 16, 0.66) 62%, rgba(9, 7, 16, 0.82) 100%);
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.room--dark .room-dim {
+  opacity: 1;
+}
+
+.df-sticker-picker {
+  grid-template-columns: repeat(4, 52px) !important;
+}
+
+/* Birthday gift — hide the sticker-editor "+" so the desk feels finished. */
+.df-add-fab {
+  display: none !important;
+}
+
+/* Anjali's photos on the desk get a polaroid-memory look. */
+.df-sticker-item[src$='Anjali-pic2.jpeg'],
+.df-sticker-item[src$='Anjali-pic3.jpeg'] {
+  background: #fff;
+  padding: 6px 6px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(80, 40, 60, 0.18);
+}
+
+/* First page: Anjali's photos blended into the page background. */
+.df-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.df-page-bg-img {
+  position: absolute;
+  width: 46%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+  opacity: 0.5;
+  filter: saturate(0.85);
+  box-shadow: 0 2px 8px rgba(80, 40, 60, 0.14);
+}
+
+.df-page-bg-img--a {
+  left: -3%;
+  top: 7%;
+  transform: rotate(-5deg);
+}
+
+.df-page-bg-img--b {
+  right: -3%;
+  bottom: 3%;
+  transform: rotate(5deg);
+}
+
+/* Let the poem keep its line breaks. */
+.df-edit--body {
+  white-space: pre-line;
+}
+
+/* A single framed photo on a diary page. */
+.df-page-photo {
+  background: #fff;
+  border-radius: 6px;
+  padding: 5px 5px 16px;
+  box-shadow: 0 3px 10px rgba(80, 40, 60, 0.16);
+  width: min(42%, 140px);
+  height: auto;
+  align-self: center;
+  margin-top: 4px;
+}
+
+.df-page-photo--a {
+  transform: rotate(-3deg);
+}
+
+.df-page-photo--b {
+  transform: rotate(2.5deg);
+}
+
+/* --- Birthday balloons --------------------------------------------------- */
+.bd-balloons {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.bd-balloon {
+  position: absolute;
+  bottom: -22vh;
+  border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+  opacity: 0;
+  box-shadow: inset -5px -7px 10px rgba(0, 0, 0, 0.06);
+  animation: bd-rise linear infinite;
+}
+
+.bd-balloon::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: 24px;
+  background: rgba(120, 100, 110, 0.35);
+}
+
+@keyframes bd-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(-60vh) translateX(16px);
+  }
+  92% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-128vh) translateX(-10px);
+    opacity: 0;
+  }
+}
+
+/* --- Birthday confetti --------------------------------------------------- */
+.bd-confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.bd-confetti-piece {
+  position: absolute;
+  top: -5vh;
+  opacity: 0;
+  border-radius: 2px;
+  animation: bd-fall linear infinite;
+}
+
+@keyframes bd-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(114vh) rotate(480deg);
+    opacity: 0.7;
+  }
+}
+
+/* --- Birthday song button ------------------------------------------------ */
+.bd-song-btn {
+  position: fixed;
+  right: 1.1rem;
+  bottom: 1.1rem;
+  z-index: 46;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  background: linear-gradient(135deg, #f472b6, #c084fc);
+  box-shadow: 0 6px 18px rgba(244, 114, 182, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bd-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes bd-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@media (max-width: 760px) {
+  .bd-song-btn {
+    right: 0.9rem;
+    bottom: 0.9rem;
+    width: 52px;
+    height: 52px;
+  }
+}
