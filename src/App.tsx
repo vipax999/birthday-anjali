@@ -100,9 +100,11 @@ function BirthdaySong() {
       }
     }
     window.addEventListener('pointerdown', tryPlay, { once: true })
+    window.addEventListener('touchstart', tryPlay, { once: true })
     window.addEventListener('keydown', tryPlay, { once: true })
     return () => {
       window.removeEventListener('pointerdown', tryPlay)
+      window.removeEventListener('touchstart', tryPlay)
       window.removeEventListener('keydown', tryPlay)
     }
   }, [])
@@ -122,7 +124,7 @@ function BirthdaySong() {
 
   return (
     <>
-      <audio ref={audio} src="/birthday-song.mp3" loop preload="auto" />
+      <audio ref={audio} src={`${import.meta.env.BASE_URL}birthday-song.mp3`} loop preload="auto" />
       <button className="bd-song-btn" onClick={toggle} aria-label="birthday song">
         {playing ? '❚❚' : '▶'}
       </button>
