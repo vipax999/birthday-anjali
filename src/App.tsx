@@ -83,29 +83,29 @@ function BirthdaySong() {
   useEffect(() => {
     const el = audio.current
     if (!el) return
-    el.play()
-      .then(() => setPlaying(true))
-      .catch(() => setPlaying(false))
-  }, [])
-
-  useEffect(() => {
-    const el = audio.current
-    if (!el) return
     const target = el
+    let started = false
+
+    el.play()
+      .then(() => {
+        started = true
+        setPlaying(true)
+      })
+      .catch(() => {})
+
     function tryPlay() {
-      if (target.paused) {
-        target.play()
-          .then(() => setPlaying(true))
-          .catch(() => {})
-      }
+      if (started) return
+      target.play().then(() => {
+        started = true
+        setPlaying(true)
+      }).catch(() => {})
     }
-    window.addEventListener('pointerdown', tryPlay, { once: true })
-    window.addEventListener('touchstart', tryPlay, { once: true })
-    window.addEventListener('keydown', tryPlay, { once: true })
+
+    const opts = { capture: true, passive: true }
+    const events = ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll']
+    events.forEach((e) => window.addEventListener(e, tryPlay, opts))
     return () => {
-      window.removeEventListener('pointerdown', tryPlay)
-      window.removeEventListener('touchstart', tryPlay)
-      window.removeEventListener('keydown', tryPlay)
+      events.forEach((e) => window.removeEventListener(e, tryPlay, opts))
     }
   }, [])
 
@@ -118,7 +118,7 @@ function BirthdaySong() {
     } else {
       el.play()
         .then(() => setPlaying(true))
-        .catch(() => setPlaying(false))
+        .catch(() => {})
     }
   }
 
@@ -128,6 +128,7 @@ function BirthdaySong() {
       <button className="bd-song-btn" onClick={toggle} aria-label="birthday song">
         {playing ? '❚❚' : '▶'}
       </button>
+      {!playing && <span className="bd-song-hint">tap anywhere · music ♪</span>}
     </>
   )
 }

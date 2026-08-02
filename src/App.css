@@ -256,11 +256,34 @@ body {
   }
 }
 
+.bd-song-hint {
+  position: fixed;
+  right: 5.4rem;
+  bottom: 1.5rem;
+  z-index: 46;
+  color: #fff;
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  background: rgba(244, 114, 182, 0.55);
+  padding: 6px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: bd-pulse 2.4s ease-in-out infinite;
+}
+
 @media (max-width: 760px) {
   .bd-song-btn {
     right: 0.9rem;
     bottom: 0.9rem;
     width: 52px;
     height: 52px;
+  }
+
+  .bd-song-hint {
+    right: 4.7rem;
+    bottom: 1.2rem;
+    font-size: 1rem;
   }
 }
